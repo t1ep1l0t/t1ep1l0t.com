@@ -16,7 +16,23 @@ export default defineNuxtPlugin(nuxtApp => {
                 state.user = user
             },
             logout (state) {
-                state.user = false
+                state.user = {
+                    auth: false,
+                    access_token: undefined,
+                    refresh_token: undefined,
+                    role: undefined,
+                    name: undefined,
+                    picture: undefined
+                }
+            }
+        },
+        actions: {
+            async get_some () {
+               // const axios =  useNuxtApp().$axios
+               //
+               //  const response = await axios.get('')
+               //
+               //  console.log(response)
             }
         }
     })
