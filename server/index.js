@@ -4,12 +4,15 @@ const dotenv = require('dotenv').config();
 const file_upload = require('express-fileupload');
 const mongoose = require('mongoose');
 const path = require("path");
+const router = require('./routes/index.ts')
 
 const app = express();
 
 app.use(cors());
+app.use(express.json());
 app.use(file_upload({}));
-app.use(express.static(path.resolve('../client/dist/')))
+app.use(express.static(path.resolve('../client/dist/')));
+app.use('/api', router);
 
 
 const start_server = async () => {
@@ -21,4 +24,4 @@ const start_server = async () => {
     }
 };
 
-start_server()
+start_server();
