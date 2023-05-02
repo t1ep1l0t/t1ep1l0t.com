@@ -75,5 +75,42 @@ class UserController {
             });
         }
     }
+    async check_access_token (req, res) {
+        try {
+            const token = req.headers.authorization?.split(' ')[1];
+
+            const result = await UserService.check_access_token(token);
+
+            res.status(result.status).json({
+                message: result.message,
+                user: result.user ? result.user : null
+            })
+
+        }catch (e) {
+            console.log(e);
+            res.status(500).json({
+                message: 'Some server error!'
+            });
+        }
+    }
+    async check_refresh_token (req, res) {
+        try {
+            const token = req.headers.authorization?.split(' ')[1];
+
+            const result = await UserService.check_refresh_token(token);
+
+            res.status(result.status).json({
+                message: result.message,
+                user: result.user ? result.user : null,
+                access_token: result.access_token ? result.access_token : null
+            })
+
+        }catch (e) {
+            console.log(e);
+            res.status(500).json({
+                message: 'Some server error!'
+            });
+        }
+    }
 }
 module.exports = new UserController();

@@ -113,6 +113,70 @@ class UserService {
             message: `User successfully deleted.`
         }
     }
+    async check_access_token (token) {
+        try {
+            if(!token) {
+                return {
+                    status: 401,
+                    message: 'Please authenticate.'
+                }
+            }
+
+            const check_token = TokenService.check_access_token(token);
+
+            const user = await UserModel.findOne({mail: check_token.mail});
+
+            return {
+                status: 200,
+                message: 'Token valid.',
+                user
+            }
+        } catch (e) {
+            return {
+                status: 401,
+                message: e
+            }
+        }
+    }
+    async check_refresh_token (token) {
+        try {
+            if(!token) {
+                return {
+                    status: 401,
+                    message: 'Please authenticate.'
+                }
+            }
+
+            const check_token = TokenService.check_refresh_token(token);
+
+            const user = await UserModel.findOne({mail: check_token.mail});
+
+            const user_for_create_tokens = {
+                mail: user.mail,
+                username: user.username,
+                user_role: user.role[0]
+            };
+
+            const refresh_token = TokenService.create_refresh_token(user_for_create_tokens);
+            const access_token = TokenService.create_access_token(user_for_create_tokens);
+
+            user.refresh_token = refresh_token;
+
+            await user.save();
+
+            return {
+                status: 200,
+                message: 'Update tokens.',
+                user,
+                access_token
+            }
+        } catch (e) {
+            return {
+                status: 401,
+                message: e
+            }
+        }
+    }
 }
 
 module.exports = new UserService();
