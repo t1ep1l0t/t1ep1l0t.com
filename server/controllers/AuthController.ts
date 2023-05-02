@@ -1,10 +1,10 @@
-const UserService = require('../services/UserService.ts');
-class UserController {
+const AuthService = require('../services/AuthService.ts');
+class AuthController {
     async registration_user (req, res) {
         try {
             const {mail, username, password } = req.body;
 
-            const {status, message} = await UserService.registration_user({mail, username, password });
+            const {status, message} = await AuthService.registration_user({mail, username, password });
 
             res.status(status).json({
                 message: message
@@ -21,7 +21,7 @@ class UserController {
         try {
             const { mail, password } = req.body;
 
-            const {status, message, find_user, access_token} =  await UserService.login_user({ mail, password });
+            const {status, message, find_user, access_token} =  await AuthService.login_user({ mail, password });
 
             if(!find_user) {
                  return  res.status(status).json({
@@ -45,7 +45,7 @@ class UserController {
         try {
             const id = req.params.id;
 
-            const logout_user = await UserService.logout_user(id);
+            const logout_user = await AuthService.logout_user(id);
 
             res.status(logout_user.status).json({
                 message: logout_user.message
@@ -62,7 +62,7 @@ class UserController {
         try {
             const id = req.params.id;
 
-            const deleted_user = await UserService.delete_user(id);
+            const deleted_user = await AuthService.delete_user(id);
 
             res.status(deleted_user.status).json({
                 message: deleted_user.message
@@ -79,7 +79,7 @@ class UserController {
         try {
             const token = req.headers.authorization?.split(' ')[1];
 
-            const result = await UserService.check_access_token(token);
+            const result = await AuthService.check_access_token(token);
 
             res.status(result.status).json({
                 message: result.message,
@@ -97,7 +97,7 @@ class UserController {
         try {
             const token = req.headers.authorization?.split(' ')[1];
 
-            const result = await UserService.check_refresh_token(token);
+            const result = await AuthService.check_refresh_token(token);
 
             res.status(result.status).json({
                 message: result.message,
@@ -113,4 +113,4 @@ class UserController {
         }
     }
 }
-module.exports = new UserController();
+module.exports = new AuthController();

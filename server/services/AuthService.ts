@@ -3,7 +3,7 @@ const TokenService = require('./TokenService.ts');
 const RoleModel = require('../models/RoleModel.ts');
 const bcrypt = require('bcrypt');
 
-class UserService {
+class AuthService {
     async registration_user ({mail, username, password }) {
         const check_email = await UserModel.findOne({mail: mail});
         if (check_email) {
@@ -179,4 +179,4 @@ class UserService {
     }
 }
 
-module.exports = new UserService();
+module.exports = new AuthService();
