@@ -1,46 +1,13 @@
-const UserModel = require('../models/UserModel.ts');
-const TokenService = require('../services/TokenService.ts');
-const RoleModel = require('../models/RoleModel.ts');
-const bcrypt = require('bcrypt')
+const UserService = require('../services/UserService.ts');
 class UserController {
     async registration_user (req, res) {
         try {
             const {mail, username, password } = req.body;
 
-            const check_email = await UserModel.findOne({mail: mail});
-            if (check_email) {
-                return res.status(401).json({
-                    message: `User with email: ${mail}, already registered, please login!`
-                })
-            }
+            const {status, message} = await UserService.registration_user({mail, username, password });
 
-            const check_username = await UserModel.findOne({username: username});
-            if (check_username) {
-                return res.status(401).json({
-                    message: `User with username: ${username}, already registered, please login!`
-                })
-            }
-
-            const user_role = await RoleModel.findOne({value: 'USER'});
-
-            const user_for_create_tokens = {mail, username, user_role};
-
-            const refresh_token = TokenService.create_refresh_token(user_for_create_tokens);
-
-            const hash_password = bcrypt.hashSync(password, 5);
-
-            const created_user = await UserModel.create({
-                mail,
-                username,
-                password: hash_password,
-                role: [user_role.value],
-                refresh_token
-            });
-
-            console.log(created_user);
-
-            res.status(200).json({
-                message: 'User successfully created!'
+            res.status(status).json({
+                message: message
             })
 
         } catch (e) {
@@ -54,28 +21,18 @@ class UserController {
         try {
             const { mail, password } = req.body;
 
-            const find_user = await UserModel.findOne({mail: mail});
-            if (!find_user) {
-                return res.status(400).json({
-                    message: `User with e-mail ${mail}, not registered, please register!`
-                })
+            const {status, message, find_user, access_token} =  await UserService.login_user({ mail, password });
+
+            if(!find_user) {
+                 return  res.status(status).json({
+                     message: message
+                 });
             }
-
-            const verify_password = bcrypt.compareSync(password, find_user.password);
-            if(!verify_password) {
-                return res.status(401).json({
-                    message: `Password for ${mail} wrong, please retry!`
-                })
-            }
-
-            const user_for_create_tokens = {
-                mail: find_user.mail,
-                username: find_user.username,
-                user_role: find_user.role[0]
-            };
-
-            const refresh_token = TokenService.create_refresh_token(user_for_create_tokens);
-            const access_token = TokenService.create_access_token(user_for_create_tokens);
+            return  res.status(status).json({
+                message: message,
+                find_user,
+                access_token
+            });
 
         } catch (e) {
             console.log(e);
@@ -84,11 +41,39 @@ class UserController {
             })
         }
     }
-    logout_user (req, res) {
+    async logout_user (req, res) {
+        try {
+            const id = req.params.id;
 
+            const logout_user = await UserService.logout_user(id);
+
+            res.status(logout_user.status).json({
+                message: logout_user.message
+            });
+
+        } catch (e) {
+            console.log(e);
+            res.status(500).json({
+                message: 'Some server error!'
+            });
+        }
     }
-    delete_user (req, res) {
+    async delete_user (req, res) {
+        try {
+            const id = req.params.id;
 
+            const deleted_user = await UserService.delete_user(id);
+
+            res.status(deleted_user.status).json({
+                message: deleted_user.message
+            })
+
+        } catch (e) {
+            console.log(e);
+            res.status(500).json({
+                message: 'Some server error!'
+            });
+        }
     }
 }
 module.exports = new UserController();

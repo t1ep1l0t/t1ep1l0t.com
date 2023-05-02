@@ -6,7 +6,7 @@ const UserModel = new mongoose.Schema({
     password: {type: String, require: true, unique: true},
     picture: {type: String, default: 'user_without_picture.jpg'},
     role: [{type: String, require: true, default: 'USER', unique: false}],
-    refresh_token: {type: String, require: true}
+    refresh_token: {type: String, require: false}
 });
 
 module.exports = mongoose.model('UserModel', UserModel);

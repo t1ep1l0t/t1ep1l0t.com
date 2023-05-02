@@ -1,10 +1,10 @@
 const jwt = require('jsonwebtoken');
 class TokenService {
     create_access_token (user) {
-        return jwt.sign(user, process.env.ACCESS_TOKEN_SK);
+        return jwt.sign(user, process.env.ACCESS_TOKEN_SK, {expiresIn: '1h'});
     }
     create_refresh_token (user) {
-        return jwt.sign(user, process.env.REFRESH_TOKEN_SK);
+        return jwt.sign(user, process.env.REFRESH_TOKEN_SK, {expiresIn: '30d'});
     }
     check_access_token (access_token) {
         return jwt.verify(access_token, process.env.ACCESS_TOKEN_SK);
